@@ -2,7 +2,7 @@ import * as functions from "firebase-functions";
 import * as admin from 'firebase-admin';
 import * as fireorm from 'fireorm';
 import Door from "./entities/door";
-import {DoorStates} from "./enums/doorStates";
+import {DoorState} from "./enums/DoorState";
 
 const serviceAccount = require('../firestore.creds.json');
 

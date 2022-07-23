@@ -1,4 +1,4 @@
-export enum EventTypes{
+export enum EventType{
     DOOR_OPENED="DOOR_CLOSED",
     DOOR_CLOSED="DOOR_CLOSED",
     DOOR_ALARM="DOOR_ALARM",

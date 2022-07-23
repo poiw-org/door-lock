@@ -1,10 +1,10 @@
 import {Collection, EntityConstructorOrPath, getRepository} from 'fireorm';
-import {EventTypes} from "../enums/eventTypes";
+import {EventType} from "../enums/EventType";
 
 @Collection()
 export default class Event {
     declare id: string;
-    declare type: EventTypes;
+    declare type: EventType;
     declare timestamp: number;
     declare payload: any;
 
