@@ -1,2 +1,6 @@
 
 .idea/
+
+backend/functions/dist/
+
+backend/functions/firestore.creds.json
