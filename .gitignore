@@ -4,3 +4,5 @@
 backend/functions/dist/
 
 backend/functions/firestore.creds.json
+
+esp8266/config.h
