@@ -76,6 +76,11 @@ void setup(void) {
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
+
+  pinMode(IDLE_LED, OUTPUT);
+  pinMode(BUSY_LED, OUTPUT);
+  pinMode(ERROR_LED, OUTPUT);
+  pinMode(SUCCESS_LED, OUTPUT);
 }
 
 
@@ -85,6 +90,9 @@ String snFromCard;
 bool readCard(){
   if (nfc.tagPresent())
     {
+      digitalWrite(IDLE_LED, LOW);
+      digitalWrite(BUSY_LED, HIGH);
+
       NfcTag tag = nfc.read();
 
       if (tag.hasNdefMessage()) // every tag won't have a message
@@ -118,7 +126,7 @@ bool readCard(){
     return false;
 }
 
-String sub;
+String sub; 
 String key;
 String sn;
 int issuedAt;
@@ -217,10 +225,27 @@ void logUnauthorizedAttempt(){
 }
 
 void openTheDoor(){
+  digitalWrite(BUSY_LED, LOW);
   Serial.println("Door Opened");
+  digitalWrite(SUCCESS_LED, HIGH);
+  delay(3000);
+  digitalWrite(SUCCESS_LED, LOW);
+}
+
+void denyEntry(){
+  digitalWrite(BUSY_LED, LOW);
+  Serial.println("Authorization failed.");
+  digitalWrite(ERROR_LED, HIGH);
+  delay(3000);
+  digitalWrite(ERROR_LED, LOW);
 }
 
 void loop(void) {
+  digitalWrite(BUSY_LED, LOW);
+  digitalWrite(ERROR_LED, LOW);
+  digitalWrite(SUCCESS_LED, LOW);
+
+  digitalWrite(IDLE_LED, HIGH);
 
   connect();
 
@@ -235,13 +260,14 @@ void loop(void) {
       }
       else{
         // Door opening was blocked due to the rules specified in allowedToEnter()
-        Serial.println("Authorization failed.");
+        denyEntry();
         logUnauthorizedAttempt();
       }
     }
     else{
       // The card was read successfully, but the token could not be authenticated. That probably means that the card did not have a JWT token written on it
       // or that the JWT token has been forged.
+      denyEntry();
       Serial.println("Failed to decode JWT.");
     }
   }

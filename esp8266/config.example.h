@@ -1,6 +1,10 @@
-
 // Door/Device identifier
 #define doorId "exampleDoor"
+
+#define IDLE_LED D5
+#define BUSY_LED D6
+#define ERROR_LED D7
+#define SUCCESS_LED D8
 
 // Wi-Fi credentials
 #define STASSID "myWiFi"
