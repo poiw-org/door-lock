@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="/favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		%svelte.head%
+	</head>
+	<body class="flex justify-center items-center xl:py-10 flex-col">
+		<div class="xl:shadow-2xl xl:rounded" style="width: 100%; max-width: 1200px;" id="svelte">%svelte.body%</div>
+		<p id="footer" class="mt-16 text-gray-400 text-center p-2">Open Source/FOSS project made by po/iw. Find the source code in our <a href="https://github.com/poiw-org" target="_blank" class="font-bold">Github page</a>.</p>
+
+	</body>
+</html>
+<style>
+	    @media print {
+        #footer{
+            display:none !important;
+        }
+    }
+</style>
