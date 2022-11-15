@@ -1,6 +1,8 @@
 // Door/Device identifier
 #define doorId "exampleDoor"
 
+#define SPEAKER D4
+
 #define IDLE_LED D5
 #define BUSY_LED D6
 #define ERROR_LED D7
