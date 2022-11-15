@@ -1,9 +1,10 @@
 <script lang="ts">
+export const prerender = false;
+
 import { browser, dev } from '$app/env';
 
 export const hydrate = dev;
 export const router = browser;
-export const prerender = false;
 
 import { page } from "$app/stores";
 
@@ -20,7 +21,7 @@ let key: Key;
 let processing = true;
 let status = "";
 
-let id = $page.query.get("id")
+let id;
 let checkOut = async () => {
         if ('NDEFReader' in window){
             //@ts-ignore
@@ -95,7 +96,7 @@ let goToRenew = () => {
 
 let entries;
 
-onMount(async ()=>{
+onMount(()=>setTimeout(async () =>{
     if(!(await auth.isAuthenticated())) window.location = "/login"
     id = $page.query.get("id")
     key = await Key.getById(id)
@@ -109,7 +110,7 @@ onMount(async ()=>{
                 })
 
     entries = Entry.fromJSON(data);
-})
+}, 500))
 
 let selectedEntry: Entry = undefined;
 let showEntry = (entry: Entry) => {
