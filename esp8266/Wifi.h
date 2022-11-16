@@ -13,6 +13,8 @@ public:
     ssid = STASSID;
     password = STAPSK;
     time = Time(NTPServer);
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(ssid, password);
   };
 
   void connect() {

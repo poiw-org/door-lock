@@ -5,7 +5,7 @@
 #include "nfc.h"
 #include "crypto.h"
 #include "logic.h"
-
+#include "Wifi.h"
 
 void setup(void) {
   Serial.begin(9600);
@@ -16,8 +16,8 @@ void setup(void) {
   Serial.print("Trying to connect to ");
   Serial.println(ssid);
 
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
+	Wifi wifi(ssid, password, NTPServer);
+	Nfc nfc();
 
   pinMode(D0, OUTPUT);
   pinMode(SPEAKER, OUTPUT);
@@ -35,13 +35,13 @@ void loop(void) {
   digitalWrite(IDLE_LED, LOW);
 
 
-  connect();
+  wifi.connect();
 
   if(forceOpen) forceOpenTheDoor();
-  else if(readCard()){
+  else if(nfc.readCard()){
      digitalWrite(BUSY_LED, HIGH);
     // Successfuly read the card, proceeding to parse/validate the JWT token.
-    if(decodeJWT()){
+		 if(key.setFields(nfc.getCard(),nfc.getSnFromTag()){
       // Successfuly decoded the JWT token, proceeding to determine if the door can open with the given key.
       if(allowedToEnter()){
           // The door can open.

@@ -9,6 +9,7 @@ private:
   String sub;
   String id;
   String sn;
+  String snFromTag;
   unsigned long issuedAt;
   unsigned long expiresAt;
   unsigned long notBefore;
@@ -19,12 +20,18 @@ public:
     sub = nullptr;
     id = nullptr;
     sn = nullptr;
+    snFromTag = nullptr;
     issuedAt = 0;
     expiresAt = 0;
     notBefore = 0;
   };
-  // Key *key;
-  bool decodeJWT() {
+
+  bool setFields(char *card, String snFromTag) {
+    this->snFromTag = snFromTag;
+    return decodeJWT(card);
+  }
+
+  bool decodeJWT(char *card) {
     jwt.allocateJWTMemory();
 
     int result = jwt.decodeJWT(card);

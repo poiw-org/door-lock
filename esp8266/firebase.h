@@ -1,5 +1,5 @@
-#include <Firebase_ESP_Client.h>
 #include "Key.h"
+#include <Firebase_ESP_Client.h>
 
 class Firebase {
 
@@ -9,23 +9,25 @@ private:
   unsigned long epochTime;
   bool isBlacklisted;
   bool connected;
-  String doorId;
+  Door door;
   Key key;
 
 public:
   Firebase(bool connected, FirebaseData fbdo, String snFromTag,
-           unsigned long epochTime, String doorId, Key key) {
+           unsigned long epochTime, Door door) {
     this->fbdo = fbdo;
-    this->snFromTag = snFromTag;
     this->epochTime = epochTime;
     this->connected = connected;
-    this->key = key;
+    this->door = door;
   };
+
+  void setKey(Key key) { this->key = key; };
+  void setSnFromTag(String snFromTag) { this->snFromTag = snFromTag; };
 
   bool allowedToEnter() {
     if (connected) {
       String blackListedURI = "/admin/blacklistedKeys/";
-      blackListedURI.concat(id);
+      blackListedURI.concat(key.id);
       Firebase.RTDB.getBool(&fbdo, blackListedURI, &isBlacklisted);
 
       if (key.sn == snFromTag && key.expiresAt > epochTime &&
@@ -47,7 +49,7 @@ public:
       return;
 
     String entryURI = "/entries/";
-    entryURI.concat(doorId);
+    entryURI.concat(door.id);
 
     FirebaseJson entry;
 
@@ -65,12 +67,18 @@ public:
                       : fbdo.errorReason().c_str());
   }
 
+  void logForceOpenDoor(){
+    String forceOpenURI = "/admin/forceOpen/";
+    forceOpenURI.concat(Key.id);
+    Firebase.RTDB.setBool(&fbdo, forceOpenURI, false);
+  }
+
   void logUnauthorizedAttempt() {
     if (!connected)
       return;
 
     String failedAuthURI = "/failedAuthorizations/";
-    failedAuthURI.concat(doorId);
+    failedAuthURI.concat(door.id);
 
     FirebaseJson failedAuthorization;
 
