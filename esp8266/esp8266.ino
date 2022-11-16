@@ -13,12 +13,12 @@ void setup(void) {
 
   nfc.begin();
 
-  Serial.print("The device will try to connect to ");
+  Serial.print("Trying to connect to ");
   Serial.println(ssid);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  
+
   pinMode(D0, OUTPUT);
   pinMode(SPEAKER, OUTPUT);
   pinMode(IDLE_LED, OUTPUT);
