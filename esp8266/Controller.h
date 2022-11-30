@@ -1,7 +1,8 @@
+#include "Door.h"
 #include "Key.h"
 #include <Firebase_ESP_Client.h>
 
-class Firebase {
+class Controller {
 
 private:
   FirebaseData fbdo;
@@ -9,22 +10,67 @@ private:
   unsigned long epochTime;
   bool isBlacklisted;
   bool connected;
-  Door door;
-  Key key;
+  Door door = nullptr;
 
 public:
-  Firebase(bool connected, FirebaseData fbdo, String snFromTag,
-           unsigned long epochTime, Door door) {
+  Controller(bool connected, FirebaseData fbdo, String snFromTag,
+             unsigned long epochTime, Door door) {
     this->fbdo = fbdo;
     this->epochTime = epochTime;
     this->connected = connected;
     this->door = door;
   };
 
-  void setKey(Key key) { this->key = key; };
-  void setSnFromTag(String snFromTag) { this->snFromTag = snFromTag; };
+  void setDoor(Door door) { this->door = door; };
 
-  bool allowedToEnter() {
+  void validate(Key key) {
+    if (this->door == nullptr) {
+      Serial.printf("No door controlled by firebase");
+      return;
+    }
+
+    if (this->allowedToEnter(key)) {
+      this->door.open();
+      this->logEntry(key);
+    } else {
+      this->logUnauthorizedAttempt(key);
+      this->door.error();
+    }
+
+    return;
+  }
+
+  void connect() {
+    Serial.println("Got new IP address: ");
+    Serial.println(WiFi.localIP());
+
+    config.api_key = API_KEY;
+    auth.user.email = USER_EMAIL;
+    auth.user.password = USER_PASSWORD;
+    config.database_url = DATABASE_URL;
+    fbdo.setResponseSize(4096);
+
+    Firebase.reconnectWiFi(true);
+    config.token_status_callback =
+        tokenStatusCallback; // see addons/TokenHelper.h
+    // config.cert.data = rootCACert;
+
+    Firebase.begin(&config, &auth);
+
+    time.startTime();
+
+    connected = true;
+    // time.setEpochTime();
+
+    // String forceOpenURI = "/admin/forceOpen/";
+    // forceOpenURI.concat(doorId);
+
+    // Firebase.RTDB.getBool(&fbdo, forceOpenURI, &forceOpen);
+  }
+
+private:
+  void setSnFromTag(String snFromTag) { this->snFromTag = snFromTag; };
+  bool allowedToEnter(Key key) {
     if (connected) {
       String blackListedURI = "/admin/blacklistedKeys/";
       blackListedURI.concat(key.id);
@@ -44,12 +90,12 @@ public:
     }
   }
 
-  void logEntry() {
+  void logEntry(Key key) {
     if (!connected)
       return;
 
     String entryURI = "/entries/";
-    entryURI.concat(door.id);
+    entryURI.concat(this->door.id);
 
     FirebaseJson entry;
 
@@ -67,18 +113,18 @@ public:
                       : fbdo.errorReason().c_str());
   }
 
-  void logForceOpenDoor(){
+  void logForceOpenDoor() {
     String forceOpenURI = "/admin/forceOpen/";
     forceOpenURI.concat(Key.id);
     Firebase.RTDB.setBool(&fbdo, forceOpenURI, false);
   }
 
-  void logUnauthorizedAttempt() {
+  void logUnauthorizedAttempt(Key key) {
     if (!connected)
       return;
 
     String failedAuthURI = "/failedAuthorizations/";
-    failedAuthURI.concat(door.id);
+    failedAuthURI.concat(this->door.id);
 
     FirebaseJson failedAuthorization;
 
@@ -111,4 +157,4 @@ public:
             ? "ok"
             : fbdo.errorReason().c_str());
   }
-}
+};
