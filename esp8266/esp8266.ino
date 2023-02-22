@@ -54,6 +54,7 @@ void connect(){
     Serial.println("Got new IP address: ");
     Serial.println(WiFi.localIP());
 
+    timeClient.begin();
     config.api_key = API_KEY;
     auth.user.email = USER_EMAIL;
     auth.user.password = USER_PASSWORD;
@@ -61,16 +62,13 @@ void connect(){
     fbdo.setResponseSize(4096);
 
     Firebase.reconnectWiFi(true);
-     config.token_status_callback = tokenStatusCallback; // see addons/TokenHelper.h
-    // config.cert.data = rootCACert;
-
-    Firebase.begin(&config, &auth);
-  
-
-    timeClient.begin();
+    config.token_status_callback = tokenStatusCallback; // see addons/TokenHelper.h
 
     connected = true;
   }
+
+  Firebase.reset(&config);
+  Firebase.begin(&config, &auth);
 
   epochTime = getTime();
   String forceOpenURI = "/admin/forceOpen/";
@@ -329,7 +327,7 @@ void loop(void) {
         logUnauthorizedAttempt();
       }
     }
-    else{
+    else{ 
       // The card was read successfully, but the token could not be authenticated. That probably means that the card did not have a JWT token written on it
       // or that the JWT token has been forged.
       denyEntry();
@@ -340,14 +338,4 @@ void loop(void) {
   digitalWrite(IDLE_LED, HIGH);
   delay(150);
   digitalWrite(IDLE_LED, LOW);
-  digitalWrite(BUSY_LED, HIGH);
-  delay(150);
-  digitalWrite(BUSY_LED, LOW);
-  digitalWrite(ERROR_LED, HIGH);
-  delay(150);
-  digitalWrite(ERROR_LED, LOW);
-  digitalWrite(SUCCESS_LED, HIGH);
-  delay(150);
-  digitalWrite(SUCCESS_LED, LOW);
-
 }
