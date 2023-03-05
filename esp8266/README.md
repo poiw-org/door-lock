@@ -5,27 +5,28 @@ The [nix package manager](https://nixos.org/download.html)
 # Dependencies
 
 ## Installation
-`sh
+```sh
 make install
-`
+```
 
 ## Update
-`sh
+```sh
 make update
-`
+```
 
 # Development
 
 ## Compilation
-`sh
+```sh
 make compile
-`
+```
 
 ## Upload
-`sh
+```sh
 make upload
-`
+```
+
 ## Monitor
-`sh
+```sh
 make monitor
-`
+```
