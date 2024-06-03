@@ -5,3 +5,4 @@ directories:
   data: ./arduino/data/
   downloads: ./arduino/downloads/
   user: ./arduino/user/
+  output: ./arduino/output/
