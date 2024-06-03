@@ -82,6 +82,8 @@ void setup(void) {
   Serial.begin(9600);
   Serial.println("Doora | po/iw hackerspace | https://github.com/poiw-org/doora");
 
+  delay(1000);
+
   nfc.begin();
 
   Serial.print("The device will try to connect to ");
@@ -90,12 +92,20 @@ void setup(void) {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   
-  pinMode(D0, OUTPUT);
+  pinMode(DOOR_PIN, OUTPUT);
   pinMode(SPEAKER, OUTPUT);
-  pinMode(IDLE_LED, OUTPUT);
   pinMode(BUSY_LED, OUTPUT);
   pinMode(ERROR_LED, OUTPUT);
   pinMode(SUCCESS_LED, OUTPUT);
+
+  digitalWrite(DOOR_PIN, LOW);
+  digitalWrite(SPEAKER, LOW);
+  digitalWrite(BUSY_LED, LOW);
+  digitalWrite(ERROR_LED, LOW);
+  digitalWrite(SUCCESS_LED, LOW);
+
+
+
 }
 
 
@@ -105,7 +115,6 @@ String snFromTag;
 bool readCard(){
   if (nfc.tagPresent())
     {
-      digitalWrite(IDLE_LED, LOW);
       digitalWrite(BUSY_LED, HIGH);
 
       NfcTag tag = nfc.read();
@@ -257,12 +266,12 @@ void openTheDoor(){
   digitalWrite(BUSY_LED, LOW);
   Serial.println("Door Opened");
   digitalWrite(SUCCESS_LED, HIGH);
-  digitalWrite(D0, HIGH);
+  digitalWrite(DOOR_PIN, HIGH);
   digitalWrite(SPEAKER, HIGH);
   delay(300);
   digitalWrite(SPEAKER, LOW);
   delay(1000);
-  digitalWrite(D0, LOW);
+  digitalWrite(DOOR_PIN, LOW);
   digitalWrite(SUCCESS_LED, LOW);
 }
 
@@ -276,12 +285,12 @@ void forceOpenTheDoor(){
   digitalWrite(BUSY_LED, LOW);
   Serial.println("Door Opened");
   digitalWrite(SUCCESS_LED, HIGH);
-  digitalWrite(D0, HIGH);
+  digitalWrite(DOOR_PIN, HIGH);
   digitalWrite(SPEAKER, HIGH);
   delay(300);
   digitalWrite(SPEAKER, LOW);
   delay(1000);
-  digitalWrite(D0, LOW);
+  digitalWrite(DOOR_PIN, LOW);
   digitalWrite(SUCCESS_LED, LOW);
 }
 
@@ -305,7 +314,6 @@ void loop(void) {
   digitalWrite(BUSY_LED, LOW);
   digitalWrite(ERROR_LED, LOW);
   digitalWrite(SUCCESS_LED, LOW);
-  digitalWrite(IDLE_LED, LOW);
 
 
   connect();
@@ -335,7 +343,6 @@ void loop(void) {
     }
   }
 
-  digitalWrite(IDLE_LED, HIGH);
   delay(150);
   digitalWrite(IDLE_LED, LOW);
 }
