@@ -15,7 +15,6 @@ public:
     unsigned long getIssuedAt() const;
     unsigned long getExpiresAt() const;
     unsigned long getNotBefore() const;
-    unsigned long getEpochTime() const;
 
 private:
     CustomJWT jwt;

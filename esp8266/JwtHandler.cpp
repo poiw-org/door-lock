@@ -58,8 +58,3 @@ unsigned long JwtHandler::getExpiresAt() const {
 unsigned long JwtHandler::getNotBefore() const {
     return notBefore;
 }
-
-unsigned long JwtHandler::getEpochTime() const {
-    // Implement NTP time fetching here if needed
-    return 0;
-}

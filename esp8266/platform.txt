@@ -1,2 +1,0 @@
-compiler.cpp.flags=-c -g -Os -std=gnu++11 -fexceptions -w -x c++ -E {includes}
-compiler.c.flags=-c -g -Os -std=gnu11 -fexceptions -w -x c -E {includes}
