@@ -8,9 +8,9 @@
 
 WiFiHandler wifiHandler;
 NfcHandler nfcHandler;
-FirebaseHandler firebaseHandler;
 JwtHandler jwtHandler(JWTDecryptioPass);
 NtpHandler ntpHandler(NTPServer);
+FirebaseHandler firebaseHandler(ntpHandler);
 EepromHandler eepromHandler;
 
 bool forceOpen = false;

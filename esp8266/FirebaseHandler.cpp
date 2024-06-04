@@ -1,6 +1,8 @@
 #include "FirebaseHandler.h"
 #include "Config.h"
 
+FirebaseHandler::FirebaseHandler(NtpHandler ntpHandler) : ntpHandler(ntpHandler) {}
+
 void FirebaseHandler::begin() {
     config.api_key = API_KEY;
     auth.user.email = USER_EMAIL;
@@ -69,7 +71,7 @@ bool FirebaseHandler::allowedToEnter(const JwtHandler& jwtHandler, const NfcHand
         blackListedURI.concat(jwtHandler.getId());
         Firebase.RTDB.getBool(&fbdo, blackListedURI, &isBlacklisted);
 
-        unsigned long epochTime = jwtHandler.getEpochTime();
+        unsigned long epochTime = ntpHandler.getTime();
         String sn = jwtHandler.getSn();  // Convert to String for comparison
 
         if (sn == nfcHandler.getSnFromTag() && 

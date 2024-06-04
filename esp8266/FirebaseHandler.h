@@ -7,9 +7,11 @@
 #include <vector>
 #include "JwtHandler.h"
 #include "NfcHandler.h"
+#include "NtpHandler.h"
 
 class FirebaseHandler {
 public:
+    FirebaseHandler(const NtpHandler ntpHandler);
     void begin();
     void syncBlacklistedKeys();
     const std::vector<String>& getBlacklistedKeys();
@@ -20,11 +22,13 @@ public:
     void logUnauthorizedAttempt(const JwtHandler& jwtHandler, const NfcHandler& nfcHandler, unsigned long epochTime);
 
 private:
+    NtpHandler ntpHandler;
     FirebaseData fbdo;
     FirebaseAuth auth;
     FirebaseConfig config;
     std::vector<String> blacklistedKeys;
     bool isBlacklisted; // Add this line
+
 };
 
 #endif // FIREBASE_HANDLER_H
