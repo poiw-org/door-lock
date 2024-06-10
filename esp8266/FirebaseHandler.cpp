@@ -1,5 +1,6 @@
 #include "FirebaseHandler.h"
 #include "Config.h"
+#include <addons/TokenHelper.h>
 
 FirebaseHandler::FirebaseHandler(NtpHandler ntpHandler) : ntpHandler(ntpHandler) {}
 
@@ -9,31 +10,28 @@ void FirebaseHandler::begin() {
     auth.user.password = USER_PASSWORD;
     config.database_url = DATABASE_URL;
     fbdo.setResponseSize(4096);
-    Firebase.reconnectWiFi(true);
+    Firebase.reconnectNetwork(false);
+    config.token_status_callback = tokenStatusCallback;
     Firebase.begin(&config, &auth);
     isBlacklisted = false; // Initialize isBlacklisted
 }
 
 void FirebaseHandler::syncBlacklistedKeys() {
-    try {
-        if (!Firebase.RTDB.get(&fbdo, "/admin/blacklistedKeys")) {
-            Serial.println("Failed to download blacklisted keys.");
-            return;
-        }
+    if (Firebase.RTDB.getString(&fbdo, F("/blacklisted_keys"))) {
+        String keys = fbdo.stringData();
+        blacklistedKeys.clear();
+        int start = 0;
+        int end = keys.indexOf(',');
 
-        if (fbdo.dataType() == "json") {
-            FirebaseJsonArray arr = fbdo.jsonArray();
-            for (int i = 0; i < arr.size(); i++) {
-                FirebaseJsonData data;
-                arr.get(data, i);
-                String key = data.to<String>();
-                blacklistedKeys.push_back(key);
-            }
-            Serial.println("Blacklisted keys downloaded.");
+        while (end != -1) {
+            blacklistedKeys.push_back(keys.substring(start, end));
+            start = end + 1;
+            end = keys.indexOf(',', start);
         }
-    } catch (const std::exception &e) {
-        Serial.print("Exception syncing blacklisted keys: ");
-        Serial.println(e.what());
+        blacklistedKeys.push_back(keys.substring(start));
+        eepromHandler.saveBlacklistedKeys(blacklistedKeys);  // Save to EEPROM
+    } else {
+        blacklistedKeys = eepromHandler.getBlacklistedKeys();  // Load from EEPROM if sync fails
     }
 }
 
@@ -71,15 +69,29 @@ bool FirebaseHandler::allowedToEnter(const JwtHandler& jwtHandler, const NfcHand
         blackListedURI.concat(jwtHandler.getId());
         Firebase.RTDB.getBool(&fbdo, blackListedURI, &isBlacklisted);
 
+        if(isBlacklisted) {
+            Serial.println("Key is blacklisted.");
+            return false;
+        }
+
         unsigned long epochTime = ntpHandler.getTime();
+
+        if(jwtHandler.getExpiresAt() <= epochTime || jwtHandler.getNotBefore() > epochTime || isBlacklisted) {
+            Serial.println("Key has expired or is not yet activated.");
+            return false;
+        }
+
+
+
         String sn = jwtHandler.getSn();  // Convert to String for comparison
 
-        if (sn == nfcHandler.getSnFromTag() && 
-            jwtHandler.getExpiresAt() > epochTime && 
-            jwtHandler.getNotBefore() < epochTime && 
-            !isBlacklisted) {
-            return true;
+        if (sn != nfcHandler.getSnFromTag()) {
+            Serial.println("Serial number mismatch.");
+            return false;
         }
+
+        return true;
+    
     } catch (const std::exception &e) {
         Serial.print("Exception checking entry permission: ");
         Serial.println(e.what());

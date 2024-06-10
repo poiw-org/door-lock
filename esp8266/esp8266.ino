@@ -6,11 +6,11 @@
 #include "NtpHandler.h"
 #include "EepromHandler.h"
 
-WiFiHandler wifiHandler;
 NfcHandler nfcHandler;
 JwtHandler jwtHandler(JWTDecryptioPass);
 NtpHandler ntpHandler(NTPServer);
 FirebaseHandler firebaseHandler(ntpHandler);
+WiFiHandler wifiHandler(firebaseHandler);
 EepromHandler eepromHandler;
 
 bool forceOpen = false;
@@ -25,9 +25,10 @@ void setup() {
 
     nfcHandler.begin();
     wifiHandler.begin(STASSID, STAPSK);
-    firebaseHandler.begin();
     ntpHandler.begin();
     eepromHandler.begin();
+
+    Serial.print("Initialized.");
 
     pinMode(DOOR_PIN, OUTPUT);
     pinMode(SPEAKER, OUTPUT);
@@ -48,7 +49,9 @@ void loop() {
     digitalWrite(SUCCESS_LED, LOW);
 
     wifiHandler.connect();
-
+    firebaseHandler.syncBlacklistedKeys();
+    ntpHandler.getTime();
+    
     if (forceOpen) {
         firebaseHandler.resetForceOpen();
         digitalWrite(DOOR_PIN, HIGH);
@@ -56,6 +59,7 @@ void loop() {
         digitalWrite(DOOR_PIN, LOW);
         forceOpen = false;
     } else if (nfcHandler.readCard()) {
+        Serial.println("Card present.");
         digitalWrite(BUSY_LED, HIGH);
         if (jwtHandler.decodeJWT(nfcHandler.getCard())) {
             if (firebaseHandler.allowedToEnter(jwtHandler, nfcHandler)) {

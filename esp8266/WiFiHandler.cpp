@@ -1,5 +1,7 @@
 #include "WiFiHandler.h"
 
+WiFiHandler::WiFiHandler(const FirebaseHandler firebaseHandler) : firebaseHandler(firebaseHandler) {}
+
 void WiFiHandler::begin(const char* ssid, const char* password) {
     this->ssid = ssid;
     this->password = password;
@@ -10,13 +12,6 @@ void WiFiHandler::begin(const char* ssid, const char* password) {
 bool WiFiHandler::connect() {
     if (WiFi.status() != WL_CONNECTED) {
         Serial.println("Connecting to WiFi...");
-        unsigned long startAttemptTime = millis();
-        while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < 5000) {
-            delay(100);
-            Serial.print(".");
-        }
-        Serial.println();
-
         if (WiFi.status() == WL_CONNECTED) {
             Serial.println("Connected to WiFi");
             Serial.print("IP Address: ");
@@ -27,5 +22,7 @@ bool WiFiHandler::connect() {
             return false;
         }
     }
+
+    firebaseHandler.begin();
     return true;
 }

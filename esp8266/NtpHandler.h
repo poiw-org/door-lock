@@ -3,6 +3,7 @@
 
 #include <NTPClient.h>
 #include <WiFiUdp.h>
+#include "EepromHandler.h"
 
 class NtpHandler {
 public:
@@ -14,6 +15,8 @@ private:
     const char* ntpServer;
     WiFiUDP ntpUDP;
     NTPClient timeClient;
+    EepromHandler eepromHandler; 
+    unsigned long lastKnownTime;
 };
 
 #endif // NTP_HANDLER_H

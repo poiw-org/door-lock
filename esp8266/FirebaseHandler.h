@@ -8,6 +8,7 @@
 #include "JwtHandler.h"
 #include "NfcHandler.h"
 #include "NtpHandler.h"
+#include "EepromHandler.h"
 
 class FirebaseHandler {
 public:
@@ -23,12 +24,12 @@ public:
 
 private:
     NtpHandler ntpHandler;
+    EepromHandler eepromHandler;
     FirebaseData fbdo;
     FirebaseAuth auth;
     FirebaseConfig config;
     std::vector<String> blacklistedKeys;
-    bool isBlacklisted; // Add this line
-
+    bool isBlacklisted;
 };
 
 #endif // FIREBASE_HANDLER_H
