@@ -24,7 +24,7 @@ let auth = {
     },
     async logout() {
         return (await this.createClient()).logout({
-            redirect_uri: "https://doora.poiw.org"
+            returnTo: "https://doora.poiw.org"
         });
     },
     async checkSession() {

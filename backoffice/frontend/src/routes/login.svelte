@@ -11,33 +11,13 @@ let auth0  = await auth.createClient();
 
 try {
     try{
-        const redirectResult = await auth0.handleRedirectCallback();
-
+        await auth0.handleRedirectCallback();
     }catch(e) {
-        // errorMessage = e.message
     }
+
     //logged in. you can get the user profile like this:
     const user = await auth0.getUser();
     if(typeof user == "undefined") await auth.login(auth0)
-    else {
-        let token = await auth0.getTokenSilently()
-
-        let {data} = await API.post("/authCheck",{},{
-            headers: {
-                    'Authorization': 'Bearer ' + token
-                }
-        })
-
-        if(data === false){
-            alert("Your account has not been granted doora administration rights and thus you will be logged out. Please contact the administrator.")
-            auth0.logout()
-            return
-        }
-
-        window.location = "/"
-    }
-
-
 }catch (e) {
     errorMessage = e.message;
 }

@@ -23,16 +23,8 @@
 
     let submit = async () => {
         processing = true
-        let token = await auth.getToken()
         try{
-            let {data:{id}} = await API.post("/key",
-                key,
-                {
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    }
-                }
-            )
+            let {data:{id}} = await API.post("/key", key)
         window.location = `/items?id=${id}`
         }catch(e){
             alert("An error occured while communicating with the backend server")
@@ -71,11 +63,7 @@
     onMount(async ()=>{
         if(!(await auth.isAuthenticated())) window.location = "/login";
 
-        users = (await API.get(`/users`, {
-                    headers: {
-                        Authorization: `Bearer ${await auth.getToken()}`
-                    }
-                })).data.map(user=>{
+        users = (await API.get(`/users`)).data.map(user=>{
                     return {
                         value: user.id,
                         label: user.email

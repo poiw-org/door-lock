@@ -103,11 +103,7 @@ onMount(()=>setTimeout(async () =>{
     processing = false;
 
 
-    let {data} = await API.get(`/entries?id=${key.id}`, {
-                    headers: {
-                        Authorization: `Bearer ${await auth.getToken()}`
-                    }
-                })
+    let {data} = await API.get(`/entries?id=${key.id}`)
 
     entries = Entry.fromJSON(data);
 }, 500))

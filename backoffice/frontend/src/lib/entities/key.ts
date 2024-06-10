@@ -47,48 +47,28 @@ export default class Key {
                 id: this.id,
                 expiresAt: this.expiresAt,
                 notBefore: this.notBefore
-            },{
-                headers: {
-                    Authorization: `Bearer ${await auth.getToken()}`
-                }
-        })
+            })
     }
 
     public async disable(): Promise<void>{
         await API.patch("/key/disable",{
             id: this.id
-        },{
-            headers: {
-                Authorization: `Bearer ${await auth.getToken()}`
-            }
         })
     }
 
     public async enable(): Promise<void>{
         await API.patch("/key/enable",{
             id: this.id
-        },{
-            headers: {
-                Authorization: `Bearer ${await auth.getToken()}`
-            }
         })
     }
 
     public async delete(): Promise<void>{
-        await API.delete(`/key?id=${this.id}`,{
-            headers: {
-                Authorization: `Bearer ${await auth.getToken()}`
-            }
-        })
+        await API.delete(`/key?id=${this.id}`)
     }
 
     public static async getById(_id: string): Promise<Key | undefined> {
             try{
-                let {data} = await API.get(`/key?id=${_id}`, {
-                    headers: {
-                        Authorization: `Bearer ${await auth.getToken()}`
-                    }
-                })
+                let {data} = await API.get(`/key?id=${_id}`)
                 return Key.fromJSON(data)
             }catch(e){
                 console.log(e.message);
@@ -99,11 +79,7 @@ export default class Key {
 
     public static async getBySerialNumber(serialNumber: string): Promise<Key | undefined> {
         try{
-            let {data} = await API.get(`/key?serialNumber=${serialNumber}`, {
-                headers: {
-                    Authorization: `Bearer ${await auth.getToken()}`
-                }
-            })
+            let {data} = await API.get(`/key?serialNumber=${serialNumber}`)
             return Key.fromJSON(data)
         }catch(e){
             console.log(e.message);

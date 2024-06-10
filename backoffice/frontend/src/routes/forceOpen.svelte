@@ -9,11 +9,7 @@
 
     let forceUnlock = async () => {
 
-        await API.get(`/forceOpen`, {
-            headers: {
-                Authorization: `Bearer ${await auth.getToken()}`
-            }
-        })
+        await API.get(`/forceOpen`)
 
         alert("Force unlock command sent!");
         window.location = "/";

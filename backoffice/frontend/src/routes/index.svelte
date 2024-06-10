@@ -63,21 +63,9 @@
         if(!(await auth.isAuthenticated())) window.location = "/login"
 
 		processing = true;
-        let token = await auth.getToken();
 
-		let {data} = await API.get(`/keys`,
-            {
-                headers: {
-                    'Authorization': 'Bearer ' + token
-                }
-            });
+		let {data} = await API.get(`/keys`);
 		latestItems = data;
-		let getShelf = $page.query.get("shelf");
-		if(getShelf){
-			searchQuery = `:shelf=${getShelf}`;
-			await search();
-			return;
-		}
 
 		items = latestItems;
 		isAuthenticated = await auth.isAuthenticated();
